@@ -12,12 +12,14 @@ namespace PhysicsEngine
         public static Vector2 Space = new Vector2(1200, 900);
         public static Vector2 WorldBorder = new Vector2(25, 25);
         public static List<VerletObject> Objects = new();
+        public static List<AttractionRule> AttractionRules = new();
         public static float repelAttractForce = 200;
 
         // Toggles
         public static bool useGravity = true;
         public static bool useConstraints = true;
         public static bool enableCollisions = true;
+        public static bool repelAwayFromWalls = true;
         public static bool attractToMouse = false;
         public static bool repelFromMouse = false;
         public static void Update(float deltaTime)
@@ -25,12 +27,28 @@ namespace PhysicsEngine
             if (useGravity) ApplyGravity();
             if (useConstraints) ApplyConstraints(deltaTime);
             if (enableCollisions) SolveColisions(deltaTime);
-            if (attractToMouse) AttractParticles(repelAttractForce);
-            if (repelFromMouse) AttractParticles(-repelAttractForce);
+            if (attractToMouse) AttractParticlesToMouse(repelAttractForce);
+            if (repelFromMouse) AttractParticlesToMouse(-repelAttractForce);
+            ApplyRules();
             UpdatePositions(deltaTime);
         }
 
-        private static void AttractParticles(float force)
+        private static void ApplyRules()
+        {
+            foreach (VerletObject obj in Objects)
+            {
+                foreach (VerletObject obj2 in Objects)
+                {
+                    if (obj == obj2) continue;
+                    AttractionRule? rule = AttractionRules.Find((x) => Utils.IsSameColor(obj.Color, x.ColorGroup1)
+                                                                   && Utils.IsSameColor(obj2.Color, x.ColorGroup2));
+                    if (rule == null) continue;
+                    var f = AttractionForce(obj, obj2, rule.Force);
+                    obj.Accelerate(f);
+                }
+            }
+        }
+        private static void AttractParticlesToMouse(float force)
         {
             foreach (VerletObject obj in Objects)
                 obj.AccelerateTowards(Raylib.GetMousePosition(), force);
@@ -38,7 +56,7 @@ namespace PhysicsEngine
 
         private static void ApplyGravity()
         {
-            foreach(VerletObject obj in Objects)           
+            foreach (VerletObject obj in Objects)
                 obj.Accelerate(Gravity);
         }
 
@@ -50,27 +68,37 @@ namespace PhysicsEngine
 
         private static void ApplyConstraints(float deltaTime)
         {
-            foreach(VerletObject obj in Objects)
+            foreach (VerletObject obj in Objects)
             {
                 Vector2 pos = obj.CurrentPosition;
                 obj.CurrentPosition = new Vector2(Math.Clamp(obj.CurrentPosition.X, WorldBorder.X + obj.Radius, Space.X - WorldBorder.X - obj.Radius),
                     Math.Clamp(obj.CurrentPosition.Y, WorldBorder.Y + obj.Radius, Space.Y - WorldBorder.Y - obj.Radius));
-                
+                var delta = Space - pos;
+                Vector2 accel = Vector2.Zero;
+                if (repelAwayFromWalls)
+                {
+                    if (delta.X < WorldBorder.X * 2) accel.X = -250;
+                    else if (delta.X > Space.X - WorldBorder.X * 2) accel.X = 250;
+                    if (delta.Y < WorldBorder.Y * 2) accel.Y = -250;
+                    else if (delta.Y > Space.Y - WorldBorder.Y * 2) accel.Y = 250;
+                }
+
+                obj.Accelerate(accel);
             }
         }
 
         private static void SolveColisions(float deltaTime)
         {
-            foreach(VerletObject obj in Objects)
+            foreach (VerletObject obj in Objects)
             {
-                foreach(VerletObject obj2 in Objects)
+                foreach (VerletObject obj2 in Objects)
                 {
                     if (obj == obj2) continue;
                     Vector2 col = obj.CurrentPosition - obj2.CurrentPosition;
                     var dist = col.Length();
-                    if (dist < obj.Radius + obj2.Radius) 
+                    if (dist < obj.Radius + obj2.Radius)
                     {
-                        Vector2 n = col / dist;
+                        Vector2 n = col / (dist + .1f);
                         var delta = obj.Radius + obj2.Radius - dist;
                         //Console.WriteLine($"{obj.CurrentPosition} {obj.CurrentPosition} |{col} | {dist} | {n} | {delta}");
                         obj.CurrentPosition += 0.5f * delta * n;
@@ -84,9 +112,9 @@ namespace PhysicsEngine
         {
             var dist = (particle1.CurrentPosition - particle2.CurrentPosition).Length();
             if (dist <= 10) return Vector2.Zero;
-            var force = acceleration / dist;
+            var force = acceleration / (dist + .1f);
 
-            var dir = (particle2.CurrentPosition - particle1.CurrentPosition) / dist;
+            var dir = (particle2.CurrentPosition - particle1.CurrentPosition) / (dist + .1f);
 
             var attraction = dir * force;
 
@@ -100,6 +128,12 @@ namespace PhysicsEngine
             var obj = new VerletObject(position,
                 rand.Next(10) + 5,
                 new Color(rand.Next(255), rand.Next(255), rand.Next(255), 255));
+            Objects.Add(obj);
+        }
+        public static void InstantiateParticle(Vector2 pos, float radius, Color color)
+        {
+            var rand = new Random();
+            var obj = new VerletObject(pos, radius, color);
             Objects.Add(obj);
         }
 

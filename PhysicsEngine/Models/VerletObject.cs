@@ -21,9 +21,9 @@ namespace PhysicsEngine.Models
         }
         public void UpdatePosition(float deltaTime)
         {
+            NaNOrOutOfBoundsCheck();
             Vector2 velocity = CurrentPosition - PreviousPosition;
             PreviousPosition = CurrentPosition;
-
             CurrentPosition = CurrentPosition + velocity + Acceleration * deltaTime * deltaTime;
             //Console.WriteLine($"{CurrentPosition} | {PreviousPosition} | {velocity}"); // For logging
             Acceleration = Vector2.Zero;
@@ -37,7 +37,17 @@ namespace PhysicsEngine.Models
         public void AccelerateTowards(Vector2 pos, float force)
         {
             var dist = pos - CurrentPosition;
-            Acceleration += force * dist/dist.Length();
+            Acceleration += force * dist/(dist.Length() + .1f);
+        }
+
+        public void NaNOrOutOfBoundsCheck()
+        {
+            if (float.IsNaN(CurrentPosition.X) || 
+                float.IsNaN(CurrentPosition.Y) ||
+                CurrentPosition.X > PhysicsEngine.Space.X ||
+                CurrentPosition.Y > PhysicsEngine.Space.Y ||
+                CurrentPosition.X < 0 ||
+                CurrentPosition.Y < 0) Console.WriteLine(CurrentPosition);
         }
     }
 }
