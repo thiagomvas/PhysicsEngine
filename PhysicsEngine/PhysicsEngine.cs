@@ -11,7 +11,7 @@ namespace PhysicsEngine
         public static Vector2 Gravity = new Vector2(0, 1000);
         public static Vector2 Space = new Vector2(1200, 900);
         public static Vector2 WorldBorder = new Vector2(25, 25);
-        public static List<VerletObject> Objects = new();
+        public static List<BaseObject> Objects = new();
         public static List<AttractionRule> AttractionRules = new();
         public static float repelAttractForce = 200;
 
@@ -35,9 +35,9 @@ namespace PhysicsEngine
 
         private static void ApplyRules()
         {
-            foreach (VerletObject obj in Objects)
+            foreach (BaseObject obj in Objects)
             {
-                foreach (VerletObject obj2 in Objects)
+                foreach (BaseObject obj2 in Objects)
                 {
                     if (obj == obj2) continue;
                     AttractionRule? rule = AttractionRules.Find((x) => Utils.IsSameColor(obj.Color, x.ColorGroup1)
@@ -50,27 +50,28 @@ namespace PhysicsEngine
         }
         private static void AttractParticlesToMouse(float force)
         {
-            foreach (VerletObject obj in Objects)
+            foreach (BaseObject obj in Objects)
                 obj.AccelerateTowards(Raylib.GetMousePosition(), force);
         }
 
         private static void ApplyGravity()
         {
-            foreach (VerletObject obj in Objects)
+            foreach (BaseObject obj in Objects)
                 obj.Accelerate(Gravity);
         }
 
         private static void UpdatePositions(float deltaTime)
         {
-            foreach (VerletObject obj in Objects)
+            foreach (BaseObject obj in Objects)
                 obj.UpdatePosition(deltaTime);
         }
 
         private static void ApplyConstraints(float deltaTime)
         {
-            foreach (VerletObject obj in Objects)
+            foreach (BaseObject obj in Objects)
             {
                 Vector2 pos = obj.CurrentPosition;
+                
                 obj.CurrentPosition = new Vector2(Math.Clamp(obj.CurrentPosition.X, WorldBorder.X + obj.Radius, Space.X - WorldBorder.X - obj.Radius),
                     Math.Clamp(obj.CurrentPosition.Y, WorldBorder.Y + obj.Radius, Space.Y - WorldBorder.Y - obj.Radius));
                 var delta = Space - pos;
@@ -108,7 +109,7 @@ namespace PhysicsEngine
             }
         }
 
-        public static Vector2 AttractionForce(VerletObject particle1, VerletObject particle2, float acceleration)
+        public static Vector2 AttractionForce(BaseObject particle1, BaseObject particle2, float acceleration)
         {
             var dist = (particle1.CurrentPosition - particle2.CurrentPosition).Length();
             if (dist <= 10) return Vector2.Zero;
@@ -130,13 +131,11 @@ namespace PhysicsEngine
                 new Color(rand.Next(255), rand.Next(255), rand.Next(255), 255));
             Objects.Add(obj);
         }
-        public static void InstantiateParticle(Vector2 pos, float radius, Color color)
+        public static void InstantiateParticle(Vector2 pos, int radius, Color color)
         {
             var rand = new Random();
             var obj = new VerletObject(pos, radius, color);
             Objects.Add(obj);
         }
-
-
     }
 }

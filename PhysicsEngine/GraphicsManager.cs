@@ -5,9 +5,9 @@ namespace PhysicsEngine
 {
     public static class GraphicsManager
     {
-        public static void Init()
+        public static void Init(int Width = 1200, int Height = 900)
         {
-            Raylib.InitWindow(1200, 900, "Physics Engine Test");
+            Raylib.InitWindow(Width, Height, "Physics Engine Test");
             Raylib.SetTargetFPS(60);
 
             while (!Raylib.WindowShouldClose()) // While window is running
@@ -25,7 +25,7 @@ namespace PhysicsEngine
                                      Color.BLACK);
 
 
-                foreach (VerletObject obj in PhysicsEngine.Objects)
+                foreach (BaseObject obj in PhysicsEngine.Objects)
                 {
                     DrawObject(obj);
                 }
@@ -33,7 +33,7 @@ namespace PhysicsEngine
                 Raylib.EndDrawing();
             }
         }
-        public static void DrawObject(VerletObject obj) => Raylib.DrawCircleV(obj.CurrentPosition, obj.Radius, obj.Color);
+        public static void DrawObject(BaseObject obj) => Raylib.DrawCircleV(obj.CurrentPosition, obj.Radius, obj.Color);
 
     }
 }

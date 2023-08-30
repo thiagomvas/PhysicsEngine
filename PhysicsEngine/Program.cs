@@ -6,36 +6,45 @@ namespace PhysicsEngine
 {
     public class Program
     {
+        public const int Width = 900, Height = 600;
         private static void Main(string[] args)
         {
             //Starting Physics Engine settings
-            PhysicsEngine.enableCollisions = false;
+            PhysicsEngine.enableCollisions = true;
             PhysicsEngine.useGravity = false;
 
             //Populate simulation
             var rand = new Random();
-            for (int i = 0; i < 250; i++)
+            
+            var widthScaled = Width - 100;
+            var heightScaled = Height - 100;
+            var widthOffset = Width - widthScaled;
+            var heightOffset = Height - heightScaled;
+            for (int i = 0; i < 50; i++)
             {
-                Vector2 position = new Vector2(rand.Next(1000) + 100, rand.Next(600) + 100);
-                float radius = 5;
+                Vector2 position = new Vector2(rand.Next(widthScaled) + widthOffset, rand.Next(heightScaled) + heightOffset);
+                int radius = 5;
                 Color color = Color.RED;
                 PhysicsEngine.InstantiateParticle(position, radius, color);
             }
-            for (int i = 0; i < 250; i++)
+
+            for (int i = 0; i < 50; i++)
             {
-                Vector2 position = new Vector2(rand.Next(1000) + 100, rand.Next(600) + 100);
-                float radius = 5;
+                Vector2 position = new Vector2(rand.Next(widthScaled) + widthOffset, rand.Next(heightScaled) + heightOffset);
+                int radius = 5;
                 Color color = Color.BLUE;
                 PhysicsEngine.InstantiateParticle(position, radius, color);
             }
 
-            PhysicsEngine.AttractionRules.Add(new AttractionRule(Color.RED, Color.BLUE, 7));
-            PhysicsEngine.AttractionRules.Add(new AttractionRule(Color.RED, Color.RED, 5));
-            PhysicsEngine.AttractionRules.Add(new AttractionRule(Color.BLUE, Color.BLUE, 24));
-            PhysicsEngine.AttractionRules.Add(new AttractionRule(Color.BLUE, Color.RED, -13));
+            // Utils.CreateChain(new Vector2(400, 250),
+            //                   new Vector2(600, 250), 5);
+            PhysicsEngine.AttractionRules.Add(new AttractionRule(Color.RED, Color.BLUE, 1500));
+            PhysicsEngine.AttractionRules.Add(new AttractionRule(Color.RED, Color.RED, 500));
+            PhysicsEngine.AttractionRules.Add(new AttractionRule(Color.BLUE, Color.BLUE, 2400));
+            PhysicsEngine.AttractionRules.Add(new AttractionRule(Color.BLUE, Color.RED, -1300));
 
-
-            GraphicsManager.Init(); // Initialize Program
+            PhysicsEngine.Space = new Vector2(Width, Height);
+            GraphicsManager.Init(Width, Height); // Initialize Program
 
         }
     }
