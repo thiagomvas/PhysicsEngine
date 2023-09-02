@@ -13,6 +13,7 @@ namespace PhysicsEngine
         public static Vector2 WorldBorder = new Vector2(25, 25);
         public static List<BaseObject> Objects = new();
         public static List<AttractionRule> AttractionRules = new();
+        public static List<ChainLink> ChainLinks = new();
         public static float repelAttractForce = 200;
 
         // Toggles
@@ -31,6 +32,7 @@ namespace PhysicsEngine
             if (repelFromMouse) AttractParticlesToMouse(-repelAttractForce);
             ApplyRules();
             UpdatePositions(deltaTime);
+            SolveLinks();
         }
 
         private static void ApplyRules()
@@ -102,13 +104,17 @@ namespace PhysicsEngine
                         Vector2 n = col / (dist + .1f);
                         var delta = obj.Radius + obj2.Radius - dist;
                         //Console.WriteLine($"{obj.CurrentPosition} {obj.CurrentPosition} |{col} | {dist} | {n} | {delta}");
-                        obj.CurrentPosition += 0.5f * delta * n;
+                        if(!obj.IsFixedPoint)obj.CurrentPosition += 0.5f * delta * n;
                         obj2.CurrentPosition -= 0.5f * delta * n;
                     }
                 }
             }
         }
 
+        private static void SolveLinks()
+        {
+            foreach (ChainLink link in ChainLinks) link.Solve();
+        }
         public static Vector2 AttractionForce(BaseObject particle1, BaseObject particle2, float acceleration)
         {
             var dist = (particle1.CurrentPosition - particle2.CurrentPosition).Length();

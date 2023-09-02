@@ -7,7 +7,7 @@ namespace PhysicsEngine.Models
     {
         public Vector2 PreviousPosition;
 
-        public VerletObject(Vector2 position, int radius, Color color)
+        public VerletObject(Vector2 position, float radius, Color color)
         {
             CurrentPosition = position;
             PreviousPosition = position;

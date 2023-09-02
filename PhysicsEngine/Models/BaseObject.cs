@@ -7,7 +7,7 @@ namespace PhysicsEngine.Models {
         public Vector2 Acceleration;
         public bool IsFixedPoint = false;
         public Color Color;
-        public int Radius;
+        public float Radius;
 
         public virtual void UpdatePosition(float deltaTime)
         {
