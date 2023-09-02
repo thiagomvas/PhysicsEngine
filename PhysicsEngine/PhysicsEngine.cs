@@ -26,8 +26,8 @@ namespace PhysicsEngine
         public static void Update(float deltaTime)
         {
             if (useGravity) ApplyGravity();
-            if (useConstraints) ApplyConstraints(deltaTime);
-            if (enableCollisions) SolveColisions(deltaTime);
+            if (useConstraints) ApplyConstraints();
+            if (enableCollisions) SolveColisions();
             if (attractToMouse) AttractParticlesToMouse(repelAttractForce);
             if (repelFromMouse) AttractParticlesToMouse(-repelAttractForce);
             ApplyRules();
@@ -68,7 +68,7 @@ namespace PhysicsEngine
                 obj.UpdatePosition(deltaTime);
         }
 
-        private static void ApplyConstraints(float deltaTime)
+        private static void ApplyConstraints()
         {
             foreach (BaseObject obj in Objects)
             {
@@ -90,7 +90,7 @@ namespace PhysicsEngine
             }
         }
 
-        private static void SolveColisions(float deltaTime)
+        private static void SolveColisions()
         {
             foreach (VerletObject obj in Objects)
             {
@@ -143,5 +143,7 @@ namespace PhysicsEngine
             var obj = new VerletObject(pos, radius, color);
             Objects.Add(obj);
         }
+
+        public static void AddAttractionRule(Color a, Color b, float force) => AttractionRules.Add(new AttractionRule(a, b, force));
     }
 }

@@ -17,7 +17,7 @@ namespace PhysicsEngine
                     break;
             }
 
-            if (Raylib.IsKeyDown(KeyboardKey.KEY_SPACE)) PhysicsEngine.InstantiateRandomParticle();
+            if (Raylib.IsKeyDown(KeyboardKey.KEY_SPACE)) PhysicsEngine.InstantiateRandomParticle(Raylib.GetMousePosition());
 
             PhysicsEngine.attractToMouse = Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT);
             PhysicsEngine.repelFromMouse = Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_RIGHT);

@@ -7,7 +7,7 @@ namespace PhysicsEngine.Models
     {
         public static bool IsSameColor(Color a, Color b)
             => (a.r == b.r && a.g == b.g && a.b == b.b);
-        public static void CreateChain(Vector2 a, Vector2 b, float linkRadius)
+        public static void CreateChain(Vector2 a, Vector2 b, float linkRadius, bool bothEndsFixed = true)
         {
             Vector2 dir = (b - a);
             var dist = dir.Length();
@@ -21,7 +21,8 @@ namespace PhysicsEngine.Models
             {
                 Vector2 pos = a + dirNormal * i * linkRadius * 2;
                 VerletObject obj = new VerletObject(pos, linkRadius, Color.DARKPURPLE);
-                if(i == 0 || i == amountOfObjects - 1) obj.IsFixedPoint = true;
+                if (i == 0) obj.IsFixedPoint = true;
+                else if (bothEndsFixed && i == amountOfObjects - 1) obj.IsFixedPoint = true;
                 objs.Add(obj);
                 PhysicsEngine.Objects.Add(obj);
             }
