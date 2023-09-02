@@ -3,20 +3,17 @@
     public class ChainLink
     {
         public VerletObject[] Links = new VerletObject[2];
+        public float targetDist = 20;
 
         public void Solve()
         {
             VerletObject obj1 = Links[0], obj2 = Links[1];
-            var dir = (obj2.CurrentPosition - obj1.CurrentPosition);
-            var dist = dir.Length();
-            var dirnormal = dir / dist;
-
-            if (dist > (obj1.Radius + obj2.Radius))
-            {
-                var realDist = dist - (obj1.Radius + obj2.Radius);
-                if (!obj1.IsFixedPoint) obj1.CurrentPosition += dirnormal * realDist * 0.5f;
-                if (!obj2.IsFixedPoint) obj2.CurrentPosition += -dirnormal * realDist * 0.5f;
-            }
+            var axis = obj1.CurrentPosition - obj2.CurrentPosition;
+            var dist = axis.Length();
+            var n = axis/dist;
+            var delta = targetDist - dist;
+            if (!obj1.IsFixedPoint) obj1.CurrentPosition += 0.5f * delta * n;
+            if (!obj2.IsFixedPoint) obj2.CurrentPosition -= 0.5f * delta * n;
         }
     }
 }

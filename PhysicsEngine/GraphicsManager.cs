@@ -17,7 +17,7 @@ namespace PhysicsEngine
 
             while (!Raylib.WindowShouldClose()) // While window is running
             {
-                PhysicsEngine.Update(Raylib.GetFrameTime()); // Trigger Physics Update every frame redraw
+                PhysicsEngine.UpdateSubsteps(Raylib.GetFrameTime()); // Trigger Physics Update every frame redraw
                 InputManager.CheckInput();                   // Checks for input
 
                 Raylib.BeginDrawing();

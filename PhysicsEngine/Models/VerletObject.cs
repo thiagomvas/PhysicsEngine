@@ -15,6 +15,7 @@ namespace PhysicsEngine.Models
             Radius = radius;
             Color = color;
         }
+
         public override void UpdatePosition(float deltaTime)
         {
             if(IsFixedPoint) return;

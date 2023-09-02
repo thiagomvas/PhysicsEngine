@@ -12,6 +12,7 @@ namespace PhysicsEngine
             //Starting Physics Engine settings
             PhysicsEngine.enableCollisions = true;
             PhysicsEngine.useGravity = true;
+            PhysicsEngine.SubSteps = 8;
 
             //Populate simulation
             var rand = new Random();
@@ -21,7 +22,7 @@ namespace PhysicsEngine
             var widthOffset = Width - widthScaled;
             var heightOffset = Height - heightScaled;
 
-            Utils.CreateChain(new Vector2(Width/2, Height/2), new Vector2(Width, Height), 3, false);
+            Utils.InstantiateChain(new Vector2(Width/4, Height/3), new Vector2(Width * 3/4, Height/3), 3, 0, false);
 
             PhysicsEngine.AddAttractionRule(Color.RED, Color.BLUE, 1500);
             PhysicsEngine.AddAttractionRule(Color.RED, Color.RED, 500);

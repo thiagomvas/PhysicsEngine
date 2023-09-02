@@ -7,6 +7,7 @@ namespace PhysicsEngine
 {
     public static class PhysicsEngine
     {
+        public static List<VerletObject> currentChain = new();
         // General Settings
         public static Vector2 Gravity = new Vector2(0, 1000);
         public static Vector2 Space = new Vector2(1200, 900);
@@ -14,13 +15,18 @@ namespace PhysicsEngine
         public static List<BaseObject> Objects = new();
         public static List<AttractionRule> AttractionRules = new();
         public static List<ChainLink> ChainLinks = new();
-        public static float repelAttractForce = 200;
+        public static float repelAttractForce = 2000;
+
+        /// <summary>
+        /// Determines how many substeps each Physics Update Tick should take(The more steps, the smoother, but also the most expensive performance-wise)
+        /// </summary>
+        public static int SubSteps = 8;
 
         // Toggles
         public static bool useGravity = true;
         public static bool useConstraints = true;
         public static bool enableCollisions = true;
-        public static bool repelAwayFromWalls = true;
+        public static bool repelAwayFromWalls = false;
         public static bool attractToMouse = false;
         public static bool repelFromMouse = false;
         public static void Update(float deltaTime)
@@ -33,6 +39,24 @@ namespace PhysicsEngine
             ApplyRules();
             UpdatePositions(deltaTime);
             SolveLinks();
+        }
+
+        public static void UpdateSubsteps(float deltaTime)
+        {
+            var subdt = deltaTime / SubSteps;
+
+            for(int i = 0; i < SubSteps; i++)
+            {
+                if (useGravity) ApplyGravity();
+                if (useConstraints) ApplyConstraints();
+                if (enableCollisions) SolveColisions();
+                if (attractToMouse) AttractParticlesToMouse(repelAttractForce);
+                if (repelFromMouse) AttractParticlesToMouse(-repelAttractForce);
+                ApplyRules();
+                UpdatePositions(subdt);
+                SolveLinks();
+            }
+
         }
 
         private static void ApplyRules()
@@ -50,7 +74,7 @@ namespace PhysicsEngine
                 }
             }
         }
-        private static void AttractParticlesToMouse(float force)
+        public static void AttractParticlesToMouse(float force)
         {
             foreach (BaseObject obj in Objects)
                 obj.AccelerateTowards(Raylib.GetMousePosition(), force);
@@ -133,7 +157,7 @@ namespace PhysicsEngine
             var rand = new Random();
             var position = pos ?? new Vector2(Raylib.GetScreenWidth() / 2 + rand.Next(200) - 100, 100);
             var obj = new VerletObject(position,
-                rand.Next(10) + 5,
+                10,
                 new Color(rand.Next(255), rand.Next(255), rand.Next(255), 255));
             Objects.Add(obj);
         }
